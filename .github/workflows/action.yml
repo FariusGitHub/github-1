@@ -31,19 +31,35 @@ jobs:
             name: zipped-bundle
             path: ${{github.sha }}.zip
             
-  upload:
+  # upload:
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   steps:
+  #     - name: Download artifact
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: zipped-bundle
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+  #         aws-region: us-east-1
+  #     - name: Upload to S3
+  #       run: aws s3 cp 01-image01.png s3://sqlzoo/
+
+  copy-to-s3:
     runs-on: ubuntu-latest
-    needs: build
+
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: zipped-bundle
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: us-east-1
-      - name: Upload to S3
-        run: aws s3 cp 01-image01.png s3://sqlzoo/
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get install -y python3-pip
+          pip3 install awscli --upgrade --user
+
+      - name: Copy file to S3
+        run: |
+          aws s3 cp 01-image01.png s3://sqlzoo/ --region us-east-1 --access-key-id ${{ secrets.AWS_ACCESS_KEY }} --secret-access-key ${{ secrets.AWS_SECRET_KEY }}
