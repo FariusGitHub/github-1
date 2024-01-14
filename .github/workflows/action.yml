@@ -30,21 +30,6 @@ jobs:
           name: zipped-bundle
           path: ${{github.sha }}.zip
 
-  publish1:
-    runs-on: ubuntu-latest
-    needs: build1    
-    steps:
-      - name: create release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          tag_name: ${{ github.run_number }}
-          release_name: Release from ${{ github.run_number }}
-          body: New release for ${{ github.sha }}
-          draft: false
-          prerelease: false
-
   build2:
       runs-on: ubuntu-latest
       needs: [build1]
@@ -120,9 +105,24 @@ jobs:
               name: zipped-bundle
               path: ${{github.sha }}.zip
 
+  publish1:
+      runs-on: ubuntu-latest
+      needs: build1    
+      steps:
+        - name: create release
+          uses: actions/create-release@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.github_token }}
+          with:
+            tag_name: ${{ github.run_number }}
+            release_name: Release from ${{ github.run_number }}
+            body: New release for ${{ github.sha }}
+            draft: false
+            prerelease: false
+
   build3:
     runs-on: ubuntu-latest
-    needs: [build4, build5]
+    needs: [build4, build5, publish1]
     steps: 
       - name: Check out code
         uses: actions/checkout@v2
