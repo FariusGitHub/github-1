@@ -70,9 +70,59 @@ jobs:
             name: zipped-bundle
             path: ${{github.sha }}.zip
 
+  build4:
+        runs-on: ubuntu-latest
+        needs: [build2]
+        steps: 
+          - name: Check out code
+            uses: actions/checkout@v2
+          - name: Set up Python on our runner
+            uses: actions/setup-python@v2
+            with:
+              python-version: 3.8
+          - name: Install dependencies
+            run: |
+                cd function
+                python -m pip install --upgrade pip
+                if  [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi
+          - name: Create zip bundle
+            run: |
+                cd function
+                zip -r ../${{github.sha}}.zip .
+          - name: Archive Artifacts
+            uses: actions/upload-artifact@v2
+            with:
+              name: zipped-bundle
+              path: ${{github.sha }}.zip
+
+  build5:
+        runs-on: ubuntu-latest
+        needs: [build2]
+        steps: 
+          - name: Check out code
+            uses: actions/checkout@v2
+          - name: Set up Python on our runner
+            uses: actions/setup-python@v2
+            with:
+              python-version: 3.8
+          - name: Install dependencies
+            run: |
+                cd function
+                python -m pip install --upgrade pip
+                if  [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi
+          - name: Create zip bundle
+            run: |
+                cd function
+                zip -r ../${{github.sha}}.zip .
+          - name: Archive Artifacts
+            uses: actions/upload-artifact@v2
+            with:
+              name: zipped-bundle
+              path: ${{github.sha }}.zip
+
   build3:
     runs-on: ubuntu-latest
-    needs: [publish1, build2]
+    needs: [publish1, build4, build5]
     steps: 
       - name: Check out code
         uses: actions/checkout@v2
