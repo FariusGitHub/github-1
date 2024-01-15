@@ -66,7 +66,7 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }} && \
           aws configure set region us-east-1 && \
           aws configure set output json && \
-          aws lambda invoke --function-name my-func-2 --cli-binary-format raw-in-base64-out --payload '{"X": -1, "Y": 2, "Z": -1}' out && cat out
+          aws lambda invoke --function-name my-func-2 --payload '{"X": -1, "Y": 2, "Z": -1}' out && cat out
 
   lambda2:
     runs-on: ubuntu-latest
@@ -86,4 +86,4 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }} && \
           aws configure set region us-east-1 && \
           aws configure set output json && \
-          aws lambda invoke --function-name my-func-2 --cli-binary-format raw-in-base64-out --payload '{"X": -1, "Y": 0, "Z": -1}' out && cat out
+          aws lambda invoke --function-name my-func-2 --payload '{"X": -1, "Y": 0, "Z": -1}' out && cat out
