@@ -63,4 +63,4 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }} && \
           aws configure set region us-east-1 && \
           aws configure set output json && \
-          aws s3 cp 01-image01.png' s3://sqlzoo/
+          aws s3 cp 01-image01.png s3://sqlzoo/
