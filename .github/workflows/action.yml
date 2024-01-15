@@ -6,7 +6,6 @@ on:
 jobs:
   publish1:
         runs-on: ubuntu-latest
-        needs: build1    
         steps:
           - name: create release
             uses: actions/create-release@v1
