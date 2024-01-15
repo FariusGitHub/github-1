@@ -48,7 +48,7 @@ jobs:
   #     - name: Upload to S3
   #       run: aws s3 cp 01-image01.png s3://sqlzoo/
 
-  copy-to-s3:
+  lambda1:
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -60,10 +60,22 @@ jobs:
           sudo apt-get install -y python3-pip
           pip3 install awscli --upgrade --user
 
-      - name: Copy file to S3
+      - name: Lambda
         run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }} && \
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }} && \
-          aws configure set region us-east-1 && \
-          aws configure set output json && \
-          aws s3 cp 01-image01.png s3://sqlzoo/ 
+          aws lambda invoke --function-name my-func-2 --cli-binary-format raw-in-base64-out --payload '{"X": -1, "Y": 2, "Z": -1}' out && cat out
+
+  lambda2:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get install -y python3-pip
+          pip3 install awscli --upgrade --user
+
+      - name: Lambda
+        run: |
+          aws lambda invoke --function-name my-func-2 --cli-binary-format raw-in-base64-out --payload '{"X": -1, "Y": 0, "Z": -1}' out && cat out
