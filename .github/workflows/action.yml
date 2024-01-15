@@ -1,19 +1,147 @@
+name: Deploy my Lambda Function
+# trigger on all push events to main branch
 on: 
   push:
     branches:
       - main
 
 jobs:
-  publish1:
+  build1:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Set up Python on our runner
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+            cd function
+            python -m pip install --upgrade pip
+            if  [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi
+      - name: Create zip bundle
+        run: |
+            cd function
+            zip -r ../${{github.sha}}.zip .
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: zipped-bundle
+          path: ${{github.sha }}.zip
+
+  build2:
+      runs-on: ubuntu-latest
+      needs: [build1]
+      steps: 
+        - name: Check out code
+          uses: actions/checkout@v2
+        - name: Set up Python on our runner
+          uses: actions/setup-python@v2
+          with:
+            python-version: 3.8
+        - name: Install dependencies
+          run: |
+              cd function
+              python -m pip install --upgrade pip
+              if  [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi
+        - name: Create zip bundle
+          run: |
+              cd function
+              zip -r ../${{github.sha}}.zip .
+        - name: Archive Artifacts
+          uses: actions/upload-artifact@v2
+          with:
+            name: zipped-bundle
+            path: ${{github.sha }}.zip
+
+  build4:
         runs-on: ubuntu-latest
-        steps:
-          - name: create release
-            uses: actions/create-release@v1
-            env:
-              GITHUB_TOKEN: ${{ secrets.github_token }}
+        needs: [build2]
+        steps: 
+          - name: Check out code
+            uses: actions/checkout@v2
+          - name: Set up Python on our runner
+            uses: actions/setup-python@v2
             with:
-              tag_name: ${{ github.run_number }}
-              release_name: Release from ${{ github.run_number }}
-              body: New release for ${{ github.sha }}
-              draft: false
-              prerelease: false
+              python-version: 3.8
+          - name: Install dependencies
+            run: |
+                cd function
+                python -m pip install --upgrade pip
+                if  [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi
+          - name: Create zip bundle
+            run: |
+                cd function
+                zip -r ../${{github.sha}}.zip .
+          - name: Archive Artifacts
+            uses: actions/upload-artifact@v2
+            with:
+              name: zipped-bundle
+              path: ${{github.sha }}.zip
+
+  build5:
+        runs-on: ubuntu-latest
+        needs: [build2]
+        steps: 
+          - name: Check out code
+            uses: actions/checkout@v2
+          - name: Set up Python on our runner
+            uses: actions/setup-python@v2
+            with:
+              python-version: 3.8
+          - name: Install dependencies
+            run: |
+                cd function
+                python -m pip install --upgrade pip
+                if  [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi
+          - name: Create zip bundle
+            run: |
+                cd function
+                zip -r ../${{github.sha}}.zip .
+          - name: Archive Artifacts
+            uses: actions/upload-artifact@v2
+            with:
+              name: zipped-bundle
+              path: ${{github.sha }}.zip
+
+  publish1:
+      runs-on: ubuntu-latest
+      needs: build1    
+      steps:
+        - name: create release
+          uses: actions/create-release@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.github_token }}
+          with:
+            tag_name: ${{ github.run_number }}
+            release_name: Release from ${{ github.run_number }}
+            body: New release for ${{ github.sha }}
+            draft: false
+            prerelease: false
+
+  
+  build6:
+    runs-on: ubuntu-latest
+    needs: [build4, build5, publish1]
+    steps: 
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Set up Python on our runner
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+            cd function
+            python -m pip install --upgrade pip
+            if  [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi
+      - name: Create zip bundle
+        run: |
+            cd function
+            zip -r ../${{github.sha}}.zip .
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: zipped-bundle
+          path: ${{github.sha }}.zip
