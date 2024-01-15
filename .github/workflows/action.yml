@@ -1,89 +1,29 @@
-name: Deploy my Lambda Function
-# trigger on all push events to main branch
 on: 
   push:
     branches:
       - main
 
 jobs:
-
-  build:
-      runs-on: ubuntu-latest
-      steps: 
-        - name: Check out code
-          uses: actions/checkout@v2
-        - name: Set up Python on our runner
-          uses: actions/setup-python@v2
-          with:
-            python-version: 3.8
-        - name: Install dependencies
-          run: |
-              cd function
-              python -m pip install --upgrade pip
-              if  [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi
-        - name: Create zip bundle
-          run: |
-              cd function
-              zip -r ../${{github.sha}}.zip .
-        - name: Archive Artifacts
-          uses: actions/upload-artifact@v2
-          with:
-            name: zipped-bundle
-            path: ${{github.sha }}.zip
-            
-  # upload:
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   steps:
-  #     - name: Download artifact
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: zipped-bundle
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-  #         aws-region: us-east-1
-  #     - name: Upload to S3
-  #       run: aws s3 cp 01-image01.png s3://sqlzoo/
-
-  lambda1:
+  build1:
     runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout repository
+    steps: 
+      - name: Check out code
         uses: actions/checkout@v2
-
-      - name: Install AWS CLI
+      - name: Set up Python on our runner
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
         run: |
-          sudo apt-get install -y python3-pip
-          pip3 install awscli --upgrade --user
-
-      - name: Lambda
+            cd function
+            python -m pip install --upgrade pip
+            if  [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi
+      - name: Create zip bundle
         run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }} && \
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }} && \
-          aws configure set region us-east-1 && \
-          aws configure set output json && \
-          aws lambda invoke --function-name my-func-2 --payload '{"X": -1, "Y": 2, "Z": -1}' out && cat out
-
-  lambda2:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get install -y python3-pip
-          pip3 install awscli --upgrade --user
-
-      - name: Lambda
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }} && \
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }} && \
-          aws configure set region us-east-1 && \
-          aws configure set output json && \
-          aws lambda invoke --function-name my-func-2 --payload '{"X": -1, "Y": 0, "Z": -1}' out && cat out
+            cd function
+            zip -r ../${{github.sha}}.zip .
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: zipped-bundle
+          path: ${{github.sha }}.zip
