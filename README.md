@@ -416,7 +416,8 @@ In term of dependencies, we normally should let the build happen first before th
 ## LAMBDA FUNCTION
 
 ![](/images/02-image08.jpg)
-Figure 8: Illustration of how a function works. It is called Lambda in AWS. In Azure it is called Functions.
+Figure 8: Illustration of how cloud function works. It is called Lambda in [AWS](https://en.wikipedia.org/wiki/AWS_Lambda). In Azure it is called [Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview). Both of them running on <br>
+[serverless](https://en.wikipedia.org/wiki/Serverless_computing) environment and designed to run code without provision or server management, automatically scale based on incoming <br> request and executes code in response to events.
 <br><br>
 
 
