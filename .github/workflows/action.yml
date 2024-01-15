@@ -1,38 +1,12 @@
-name: Deploy my Lambda Function
-# trigger on all push events to main branch
 on: 
   push:
     branches:
       - main
 
 jobs:
-  build1:
-    runs-on: ubuntu-latest
-    steps: 
-      - name: Check out code
-        uses: actions/checkout@v2
-      - name: Set up Python on our runner
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Install dependencies
-        run: |
-            cd function
-            python -m pip install --upgrade pip
-            if  [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi
-      - name: Create zip bundle
-        run: |
-            cd function
-            zip -r ../${{github.sha}}.zip .
-      - name: Archive Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: zipped-bundle
-          path: ${{github.sha }}.zip
 
-  build2:
+  build:
       runs-on: ubuntu-latest
-      needs: [build1]
       steps: 
         - name: Check out code
           uses: actions/checkout@v2
@@ -54,94 +28,39 @@ jobs:
           with:
             name: zipped-bundle
             path: ${{github.sha }}.zip
+            
+  # upload:
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   steps:
+  #     - name: Download artifact
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: zipped-bundle
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+  #         aws-region: us-east-1
+  #     - name: Upload to S3
+  #       run: aws s3 cp 01-image01.png s3://sqlzoo/
 
-  build4:
-        runs-on: ubuntu-latest
-        needs: [build2]
-        steps: 
-          - name: Check out code
-            uses: actions/checkout@v2
-          - name: Set up Python on our runner
-            uses: actions/setup-python@v2
-            with:
-              python-version: 3.8
-          - name: Install dependencies
-            run: |
-                cd function
-                python -m pip install --upgrade pip
-                if  [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi
-          - name: Create zip bundle
-            run: |
-                cd function
-                zip -r ../${{github.sha}}.zip .
-          - name: Archive Artifacts
-            uses: actions/upload-artifact@v2
-            with:
-              name: zipped-bundle
-              path: ${{github.sha }}.zip
-
-  build5:
-        runs-on: ubuntu-latest
-        needs: [build2]
-        steps: 
-          - name: Check out code
-            uses: actions/checkout@v2
-          - name: Set up Python on our runner
-            uses: actions/setup-python@v2
-            with:
-              python-version: 3.8
-          - name: Install dependencies
-            run: |
-                cd function
-                python -m pip install --upgrade pip
-                if  [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi
-          - name: Create zip bundle
-            run: |
-                cd function
-                zip -r ../${{github.sha}}.zip .
-          - name: Archive Artifacts
-            uses: actions/upload-artifact@v2
-            with:
-              name: zipped-bundle
-              path: ${{github.sha }}.zip
-
-  publish1:
-      runs-on: ubuntu-latest
-      needs: build1    
-      steps:
-        - name: create release
-          uses: actions/create-release@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.github_token }}
-          with:
-            tag_name: ${{ github.run_number }}
-            release_name: Release from ${{ github.run_number }}
-            body: New release for ${{ github.sha }}
-            draft: false
-            prerelease: false
-
-  
-  build6:
+  copy-to-s3:
     runs-on: ubuntu-latest
-    needs: [build4, build5, publish1]
-    steps: 
-      - name: Check out code
+
+    steps:
+      - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Set up Python on our runner
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Install dependencies
+
+      - name: Install AWS CLI
         run: |
-            cd function
-            python -m pip install --upgrade pip
-            if  [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi
-      - name: Create zip bundle
+          sudo apt-get install -y python3-pip
+          pip3 install awscli --upgrade --user
+      - name: Copy file to S3
         run: |
-            cd function
-            zip -r ../${{github.sha}}.zip .
-      - name: Archive Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: zipped-bundle
-          path: ${{github.sha }}.zip
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }} && \
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }} && \
+          aws configure set region us-east-1 && \
+          aws configure set output json && \
+          aws s3 cp 01-image01.png s3://sqlzoo/
