@@ -417,8 +417,8 @@ In term of dependencies, we normally should let the build happen first before th
 
 ![](/images/02-image08.jpg)
 Figure 8: Illustration of how cloud function works. It is called Lambda in [AWS](https://en.wikipedia.org/wiki/AWS_Lambda). In Azure it is called [Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview). <br> 
-Both of them running on [serverless](https://en.wikipedia.org/wiki/Serverless_computing) environment and designed to run code without provision or server management, <br> 
-automatically scale based on incoming <br> request and executes code in response to events. <br><br>
+Both of them running on [serverless](https://en.wikipedia.org/wiki/Serverless_computing) environment and designed to run code without provision or server <br> 
+management, automatically scale based on incoming <br> request and executes code in response to events. <br><br>
 
 
 In the last part of this GitHub Action discussion, I would like to bring one more thing also from AWS by calling Lambda function below (assuming it was already set before from AWS Console) and return back the function value as input parameters were given.
