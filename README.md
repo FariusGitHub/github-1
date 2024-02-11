@@ -557,7 +557,7 @@ Figure 12: Example of entering input parameter through AWS Console, which is not
 <br><br>
 
 ## SUMMARY
-GitHub Actions which allows building continuous integration and continuous deployment pipelines for testing, releasing and deploying software without the use of third-party websites/platforms. Some of good thought from GitHub Action as mentioned in https://resources.github.com/downloads/What-is-GitHub.Actions_.Benefits-and-examples.pdf would be
+GitHub Actions which allows building continuous integration and continuous deployment pipelines for testing, releasing and deploying software without the use of third-party websites/platforms. Some of good thought from GitHub Action would be
 
 ```txt
 ● Build, test, and deploy within the GitHub flow: Continuous
